@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1069966275674",
+    "project_id": "notes-project-flutter-tutorial",
+    "storage_bucket": "notes-project-flutter-tutorial.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069966275674:android:05e0c6d65d9359820c1463",
+        "android_client_info": {
+          "package_name": "com.simon.notes_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKf1oCDXZAdOLp6OcUv3znPqnLmUZe-5I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
