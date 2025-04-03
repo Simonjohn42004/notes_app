@@ -5,6 +5,7 @@ import 'package:notes_app/firebase_options.dart';
 import 'package:notes_app/views/login_views.dart';
 import 'package:notes_app/views/register_view.dart';
 import 'package:notes_app/views/verify_email_view.dart';
+import 'dart:developer' as devtools show log;
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,17 +34,16 @@ class HomePage extends StatelessWidget {
         switch (snapshot.connectionState) {
           case ConnectionState.done:
             final user = FirebaseAuth.instance.currentUser;
-            print(user);
             if (user == null) {
               return LoginView();
             }
             if (user.emailVerified) {
-              print("You are a verified user");
+              devtools.log("email verified");
+              devtools.log("Hello World");
+              return NotesView();
             } else {
-              print("Verify your email first");
               return const VerifyEmailView();
             }
-            return Text("Done!");
           default:
             return CircularProgressIndicator();
         }
@@ -53,4 +53,80 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+}
+
+class NotesView extends StatefulWidget {
+  const NotesView({super.key});
+
+  @override
+  State<NotesView> createState() => _NotesViewState();
+}
+
+class _NotesViewState extends State<NotesView> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Main UI", style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blueAccent,
+        actions: [
+          PopupMenuButton<MenuOptions>(
+            onSelected: (value) async {
+              devtools.log(value.toString());
+              switch (value) {
+                case MenuOptions.logOut:
+                  bool shouldLogOut = await showLogOutDialog(context);
+                  devtools.log(shouldLogOut.toString());
+                  if (shouldLogOut) {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.of(
+                      context,
+                    ).pushNamedAndRemoveUntil("/login/", (_) => false);
+                  }
+              }
+            },
+            itemBuilder: (context) {
+              return const [
+                PopupMenuItem<MenuOptions>(
+                  value: MenuOptions.logOut,
+                  child: Text("Logout"),
+                ),
+              ];
+            },
+            color: Colors.white,
+            iconColor: Colors.white,
+          ),
+        ],
+      ),
+      body: const Text("Hello World"),
+    );
+  }
+}
+
+enum MenuOptions { logOut }
+
+Future<bool> showLogOutDialog(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text("Log Out"),
+        content: Text("Do you really want to Log out?"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+            child: Text("Log Out"),
+          ),
+        ],
+      );
+    },
+  ).then((value) => value ?? false);
 }
