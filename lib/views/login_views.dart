@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
+import 'package:notes_app/constants/routes.dart';
+
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
 
@@ -55,23 +57,27 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                final userCredential = await FirebaseAuth.instance
-                    .signInWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-                devtools.log(userCredential.toString());
+                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                  email: email,
+                  password: password,
+                );
+                if (!context.mounted) return;
+                Navigator.of(
+                  context,
+                ).pushNamedAndRemoveUntil(notesRoute, (route) => false);
               } on FirebaseAuthException catch (e) {
                 if (e.code == "email-already-in-use") {
-                  print(
+                  devtools.log(
                     "Account already registered, Please use a different email!",
                   );
                 } else if (e.code == "weak-password") {
-                  print("Password too weak!, Think of something more strong");
+                  devtools.log(
+                    "Password too weak!, Think of something more strong",
+                  );
                 } else if (e.code == "invalid-email") {
-                  print("Invalid Email, please enter a valid email");
+                  devtools.log("Invalid Email, please enter a valid email");
                 } else {
-                  print(e.code);
+                  devtools.log(e.code);
                 }
               }
             },
@@ -81,7 +87,7 @@ class _LoginViewState extends State<LoginView> {
             onPressed: () {
               Navigator.of(
                 context,
-              ).pushNamedAndRemoveUntil("/register/", (route) => false);
+              ).pushNamedAndRemoveUntil(registerRoute, (route) => false);
             },
             child: const Text("Not registered yet? Register Here"),
           ),
