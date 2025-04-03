@@ -18,7 +18,7 @@ void main() {
       ),
       home: const HomePage(),
       routes: {
-        loginRoute : (context) => LoginView(),
+        loginRoute: (context) => LoginView(),
         registerRoute: (context) => RegisterView(),
         notesRoute: (context) => NotesView(),
       },
@@ -84,7 +84,7 @@ class _NotesViewState extends State<NotesView> {
                     if (!context.mounted) return;
                     Navigator.of(
                       context,
-                    ).pushNamedAndRemoveUntil(loginRoute , (_) => false);
+                    ).pushNamedAndRemoveUntil(loginRoute, (_) => false);
                   }
               }
             },

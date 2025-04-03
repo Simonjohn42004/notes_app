@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'dart:developer' as devtools show log;
 
 import 'package:notes_app/constants/routes.dart';
+import 'package:notes_app/utilities/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -66,16 +67,21 @@ class _LoginViewState extends State<LoginView> {
                   context,
                 ).pushNamedAndRemoveUntil(notesRoute, (route) => false);
               } on FirebaseAuthException catch (e) {
-                if (e.code == "email-already-in-use") {
-                  devtools.log(
-                    "Account already registered, Please use a different email!",
-                  );
-                } else if (e.code == "weak-password") {
-                  devtools.log(
-                    "Password too weak!, Think of something more strong",
+                if (e.code == "user-not-found") {
+                  if (!context.mounted) return;
+                  await showErrorDialog(context, "User Not Found!");
+                } else if (e.code == "invalid-credential") {
+                  if (!context.mounted) return;
+                  await showErrorDialog(
+                    context,
+                    "Wrong email and password! please try again",
                   );
                 } else if (e.code == "invalid-email") {
-                  devtools.log("Invalid Email, please enter a valid email");
+                  if (!context.mounted) return;
+                  await showErrorDialog(
+                    context,
+                    "Invalid Email Entered. Please enter a valid mail",
+                  );
                 } else {
                   devtools.log(e.code);
                 }
