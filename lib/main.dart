@@ -21,6 +21,7 @@ void main() {
         loginRoute: (context) => LoginView(),
         registerRoute: (context) => RegisterView(),
         notesRoute: (context) => NotesView(),
+        verfiyEmailRoute: (context) => VerifyEmailView(),
       },
     ),
   );
@@ -44,7 +45,7 @@ class HomePage extends StatelessWidget {
               devtools.log("Hello World");
               return NotesView();
             } else {
-              return const VerifyEmailView();
+              return LoginView();
             }
           default:
             return CircularProgressIndicator();

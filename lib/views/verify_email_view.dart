@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +11,7 @@ class VerifyEmailView extends StatefulWidget {
 class _VerifyEmailViewState extends State<VerifyEmailView> {
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: Text("Login", style: TextStyle(color: Colors.white)),
@@ -19,7 +19,8 @@ class _VerifyEmailViewState extends State<VerifyEmailView> {
       ),
       body: Column(
         children: [
-          Text("Please verify your email address"),
+          Text("We have sent you an confirmation mail to the mail id provided by you. Please verify it!"),
+          Text("If you didn't receive the mail. Please click the below button."),
           TextButton(
             onPressed: () async {
               final user = FirebaseAuth.instance.currentUser;

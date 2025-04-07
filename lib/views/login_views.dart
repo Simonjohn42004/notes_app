@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as devtools show log;
 
 import 'package:notes_app/constants/routes.dart';
 import 'package:notes_app/utilities/show_error_dialog.dart';
@@ -62,10 +61,18 @@ class _LoginViewState extends State<LoginView> {
                   email: email,
                   password: password,
                 );
+                bool isVerified =
+                    FirebaseAuth.instance.currentUser?.emailVerified ?? false;
                 if (!context.mounted) return;
-                Navigator.of(
-                  context,
-                ).pushNamedAndRemoveUntil(notesRoute, (route) => false);
+                if (isVerified) {
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil(notesRoute, (route) => false);
+                } else {
+                  final user = FirebaseAuth.instance.currentUser;
+                  user?.sendEmailVerification();
+                  Navigator.pushNamed(context, verfiyEmailRoute);
+                }
               } on FirebaseAuthException catch (e) {
                 if (e.code == "user-not-found") {
                   if (!context.mounted) return;
@@ -83,7 +90,8 @@ class _LoginViewState extends State<LoginView> {
                     "Invalid Email Entered. Please enter a valid mail",
                   );
                 } else {
-                  devtools.log(e.code);
+                  if (!context.mounted) return;
+                  await showErrorDialog(context, e.code);
                 }
               }
             },
