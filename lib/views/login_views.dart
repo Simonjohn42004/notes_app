@@ -1,8 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:notes_app/constants/routes.dart';
+import 'package:notes_app/services/auth/auth_exceptions.dart';
 import 'package:notes_app/services/auth/auth_service.dart';
+import 'package:notes_app/utilities/show_error_dialog.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -69,12 +69,19 @@ class _LoginViewState extends State<LoginView> {
                     context,
                   ).pushNamedAndRemoveUntil(notesRoute, (route) => false);
                 } else {
-                  AuthService.firebase().sendEmailVerification();
+                  await AuthService.firebase().sendEmailVerification();
+                  if (!context.mounted) return;
                   Navigator.pushNamed(context, verfiyEmailRoute);
                 }
-              } on FirebaseAuthException catch (e) {
-                // TODO: implementing the catch statements
-                Text(e.code);
+              } on UserNotFoundAuthException catch (_) {
+                await showErrorDialog(context, "User Not Found");
+              } on WrongPasswordAuthException catch (_) {
+                await showErrorDialog(context, "Wrong credentials");
+              } on GenericAuthException catch (_) {
+                await showErrorDialog(
+                  context,
+                  "An unknownn Authentication Error occured",
+                );
               }
             },
             child: Text("Login"),

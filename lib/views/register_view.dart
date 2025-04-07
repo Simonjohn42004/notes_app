@@ -1,7 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
 import 'package:notes_app/constants/routes.dart';
+import 'package:notes_app/services/auth/auth_exceptions.dart';
+import 'package:notes_app/services/auth/auth_service.dart';
+import 'package:notes_app/utilities/show_error_dialog.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -56,15 +57,34 @@ class _RegisterViewState extends State<RegisterView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                await AuthService.firebase().createUser(
                   email: email,
                   password: password,
                 );
                 if (!context.mounted) return;
-                FirebaseAuth.instance.currentUser?.sendEmailVerification();
+                await AuthService.firebase().sendEmailVerification();
+                if (!context.mounted) return;
                 Navigator.of(context).pushNamed(verfiyEmailRoute);
-              } on FirebaseAuthException {
-                // TODO: implementing the catch statements
+              } on WeakPasswordAuthException catch (_) {
+                await showErrorDialog(
+                  context,
+                  "Weak Password! Please try again",
+                );
+              } on EmailAlreadyInUseAuthException catch (_) {
+                await showErrorDialog(
+                  context,
+                  "Email already in use, please try an email that is not registered",
+                );
+              } on InvalidEmailAuthException catch (_) {
+                await showErrorDialog(
+                  context,
+                  "Invalid email! please enter a proper email",
+                );
+              } on GenericAuthException catch (_) {
+                await showErrorDialog(
+                  context,
+                  "An unknown authentication error occured",
+                );
               }
             },
             child: Text("Register"),
