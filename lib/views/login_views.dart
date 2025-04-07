@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'package:notes_app/constants/routes.dart';
-import 'package:notes_app/utilities/show_error_dialog.dart';
+import 'package:notes_app/services/auth/auth_service.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -57,24 +57,24 @@ class _LoginViewState extends State<LoginView> {
               final email = _email.text;
               final password = _password.text;
               try {
-                await FirebaseAuth.instance.signInWithEmailAndPassword(
+                await AuthService.firebase().logIn(
                   email: email,
                   password: password,
                 );
-                bool isVerified =
-                    FirebaseAuth.instance.currentUser?.emailVerified ?? false;
+                final user = AuthService.firebase().user;
+                final bool isVerified = user?.isEmailVerified ?? false;
                 if (!context.mounted) return;
                 if (isVerified) {
                   Navigator.of(
                     context,
                   ).pushNamedAndRemoveUntil(notesRoute, (route) => false);
                 } else {
-                  final user = FirebaseAuth.instance.currentUser;
-                  user?.sendEmailVerification();
+                  AuthService.firebase().sendEmailVerification();
                   Navigator.pushNamed(context, verfiyEmailRoute);
                 }
               } on FirebaseAuthException catch (e) {
                 // TODO: implementing the catch statements
+                Text(e.code);
               }
             },
             child: Text("Login"),
