@@ -74,25 +74,7 @@ class _LoginViewState extends State<LoginView> {
                   Navigator.pushNamed(context, verfiyEmailRoute);
                 }
               } on FirebaseAuthException catch (e) {
-                if (e.code == "user-not-found") {
-                  if (!context.mounted) return;
-                  await showErrorDialog(context, "User Not Found!");
-                } else if (e.code == "invalid-credential") {
-                  if (!context.mounted) return;
-                  await showErrorDialog(
-                    context,
-                    "Wrong email and password! please try again",
-                  );
-                } else if (e.code == "invalid-email") {
-                  if (!context.mounted) return;
-                  await showErrorDialog(
-                    context,
-                    "Invalid Email Entered. Please enter a valid mail",
-                  );
-                } else {
-                  if (!context.mounted) return;
-                  await showErrorDialog(context, e.code);
-                }
+                // TODO: implementing the catch statements
               }
             },
             child: Text("Login"),
