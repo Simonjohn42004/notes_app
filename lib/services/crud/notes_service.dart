@@ -12,8 +12,8 @@ class NotesService {
 
   List<DatabaseNote> _list = [];
   // creating a singleton for the notes service
-  static final NotesService _shared = NotesService._sharedInstance();
-  NotesService._sharedInstance();
+  static final NotesService _shared = NotesService._();
+  NotesService._();
   factory NotesService() => _shared;
 
   final _notesStreamController =
