@@ -13,11 +13,16 @@ class NotesService {
   List<DatabaseNote> _list = [];
   // creating a singleton for the notes service
   static final NotesService _shared = NotesService._();
-  NotesService._();
+  NotesService._(){
+    _notesStreamController = StreamController.broadcast(
+      onListen: () {
+        _notesStreamController.sink.add(_list);
+      },
+    );
+  }
   factory NotesService() => _shared;
 
-  final _notesStreamController =
-      StreamController<List<DatabaseNote>>.broadcast();
+  late final StreamController<List<DatabaseNote>> _notesStreamController;
 
   Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
   Future<DatabaseUser> getOrCreateUser({required String email}) async {
