@@ -4,8 +4,9 @@ import 'package:flutter/widgets.dart';
 @immutable
 class AuthUser {
   final bool isEmailVerified;
-  final String? email;
-  const AuthUser({required this.email, required this.isEmailVerified});
+  final String email;
+  final String userId;
+  const AuthUser( {required this.userId, required this.email, required this.isEmailVerified});
   factory AuthUser.fromFirebase(User user) =>
-      AuthUser(email : user.email, isEmailVerified: user.emailVerified);
+      AuthUser(email: user.email! , isEmailVerified: user.emailVerified, userId : user.uid);
 }

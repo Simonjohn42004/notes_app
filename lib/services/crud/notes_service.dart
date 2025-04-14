@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart' show immutable;
-import 'package:notes_app/constants/database.dart';
+import 'package:notes_app/services/cloud/local_database_storage_constants.dart';
 import 'package:notes_app/extensions/list/filter.dart';
 import 'package:notes_app/services/crud/crud_exceptions.dart';
 import 'package:sqflite/sqflite.dart';

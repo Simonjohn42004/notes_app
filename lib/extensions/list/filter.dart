@@ -3,5 +3,3 @@ extension Filter<T> on Stream<List<T>> {
     return map((items) => items.where(where).toList());
   }
 }
-
-
