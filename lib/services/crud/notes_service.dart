@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart' show immutable;
 import 'package:notes_app/constants/database.dart';
+import 'package:notes_app/extensions/list/filter.dart';
 import 'package:notes_app/services/crud/crud_exceptions.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart'
@@ -11,9 +12,10 @@ class NotesService {
   Database? _db;
 
   List<DatabaseNote> _list = [];
+  DatabaseUser? _user;
   // creating a singleton for the notes service
   static final NotesService _shared = NotesService._();
-  NotesService._(){
+  NotesService._() {
     _notesStreamController = StreamController.broadcast(
       onListen: () {
         _notesStreamController.sink.add(_list);
@@ -24,13 +26,29 @@ class NotesService {
 
   late final StreamController<List<DatabaseNote>> _notesStreamController;
 
-  Stream<List<DatabaseNote>> get allNotes => _notesStreamController.stream;
-  Future<DatabaseUser> getOrCreateUser({required String email}) async {
+  Stream<List<DatabaseNote>> get allNotes =>
+      _notesStreamController.stream.filter((note) {
+        final currentUser = _user;
+        if (currentUser == null) {
+          throw UserShouldBeSetBeforeReadingAllNotes();
+        }
+        return note.userId == currentUser.id;
+      });
+  Future<DatabaseUser> getOrCreateUser({
+    required String email,
+    bool setAsCurrentuser = true,
+  }) async {
     try {
-      final db = await getUser(email: email);
-      return db;
+      final user = await getUser(email: email);
+      if (setAsCurrentuser) {
+        _user = user;
+      }
+      return user;
     } on CouldNotFindUser {
       final createdUser = await createUser(email: email);
+      if (setAsCurrentuser) {
+        _user = createdUser;
+      }
       return createdUser;
     } catch (e) {
       rethrow;
@@ -39,8 +57,8 @@ class NotesService {
 
   Future<void> _cacheNotes() async {
     final allNotes = await getAllNotes();
-    final notes = allNotes.toList();
-    _notesStreamController.add(notes);
+    _list = allNotes.toList();
+    _notesStreamController.add(_list);
   }
 
   Future<DatabaseNote> updateNote({

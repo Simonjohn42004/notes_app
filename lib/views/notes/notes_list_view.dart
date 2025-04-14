@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:notes_app/services/crud/notes_service.dart';
 import 'package:notes_app/utilities/dialogs/delete_dialog.dart';
+// import 'dart:developer' as devtools show log;
 
 typedef NoteCallBack = void Function(DatabaseNote note);
 
@@ -35,7 +36,7 @@ class NotesListView extends StatelessWidget {
             onPressed: () async {
               final shouldDelete = await showDeleteDialog(context);
               if (shouldDelete) {
-                onDeleteNote;
+                onDeleteNote(note);
               }
             },
             icon: Icon(Icons.delete),
