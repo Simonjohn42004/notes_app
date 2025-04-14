@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:notes_app/constants/routes.dart';
 import 'package:notes_app/services/auth/auth_service.dart';
 import 'package:notes_app/services/crud/notes_service.dart';
+import 'package:notes_app/utilities/dialogs/logout_dialog.dart';
 import 'package:notes_app/utilities/menu_options.dart';
-import 'package:notes_app/utilities/show_logout_dialog.dart';
+import 'package:notes_app/views/notes/notes_list_view.dart';
 
 class NotesView extends StatefulWidget {
   const NotesView({super.key});
@@ -42,7 +43,7 @@ class _NotesViewState extends State<NotesView> {
               devtools.log(value.toString());
               switch (value) {
                 case MenuOptions.logOut:
-                  bool shouldLogOut = await showLogOutDialog(context);
+                  bool shouldLogOut = await showLogoutDialog(context);
                   devtools.log(shouldLogOut.toString());
                   if (shouldLogOut) {
                     await AuthService.firebase().logOut();
@@ -80,18 +81,10 @@ class _NotesViewState extends State<NotesView> {
                       if (snapshot.hasData) {
                         final allNotes = snapshot.data as List<DatabaseNote>;
                         devtools.log(allNotes.toString());
-                        return ListView.builder(
-                          itemCount: allNotes.length,
-                          itemBuilder: (context, index) {
-                            final note = allNotes[index];
-                            return ListTile(
-                              title: Text(
-                                note.text,
-                                maxLines: 1,
-                                softWrap: true,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            );
+                        return NotesListView(
+                          notes: allNotes,
+                          onDeleteNote: (note) async{
+                            await _notesService.deleteNote(id: note.id);
                           },
                         );
                       } else {
