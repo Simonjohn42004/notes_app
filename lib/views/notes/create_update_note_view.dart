@@ -87,7 +87,7 @@ class _CreateUpdateNoteViewState extends State<CreateUpdateNoteView> {
         backgroundColor: Colors.blueAccent,
         actions: [
           IconButton(
-            onPressed: () async {
+            onPressed: () async { 
               final text = _textController.text;
               if (_note == null || text.isEmpty) {
                 await showCannotShareEmptyNoteDialog(context);
