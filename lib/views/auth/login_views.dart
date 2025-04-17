@@ -4,7 +4,9 @@ import 'package:notes_app/constants/routes.dart';
 import 'package:notes_app/services/auth/auth_exceptions.dart';
 import 'package:notes_app/services/auth/bloc/auth_bloc.dart';
 import 'package:notes_app/services/auth/bloc/auth_event.dart';
+import 'package:notes_app/services/auth/bloc/auth_state.dart';
 import 'package:notes_app/utilities/dialogs/error_dialog.dart';
+import 'dart:developer' as devtools show log;
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -54,27 +56,30 @@ class _LoginViewState extends State<LoginView> {
             autocorrect: false,
             decoration: const InputDecoration(hintText: "Enter Password"),
           ),
-          TextButton(
-            onPressed: () async {
-              final email = _email.text;
-              final password = _password.text;
-              try {
-                context.read<AuthBloc>().add(
-                  AuthEventLogIn(email, password),
-                );
-                
-              } on UserNotFoundAuthException catch (_) {
-                await showErrorDialog(context, "User Not Found");
-              } on WrongPasswordAuthException catch (_) {
-                await showErrorDialog(context, "Wrong credentials");
-              } on GenericAuthException catch (_) {
-                await showErrorDialog(
-                  context,
-                  "An unknownn Authentication Error occured",
-                );
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) async {
+              if (state is AuthStateLoggedOut) {
+                devtools.log(state.exception.toString());
+                if (!context.mounted) return;
+                if (state.exception is UserNotFoundAuthException) {
+                  await showErrorDialog(context, "User Not Found");
+                } else if (state.exception is WrongPasswordAuthException) {
+                  await showErrorDialog(context, "Wrong credentials");
+                } else if (state.exception is GenericAuthException) {
+                  await showErrorDialog(context, "Authentication error");
+                } else if (state.exception is InvalidEmailAuthException) {
+                  await showErrorDialog(context, "Invalid email entered");
+                }
               }
             },
-            child: Text("Login"),
+            child: TextButton(
+              onPressed: () {
+                final email = _email.text;
+                final password = _password.text;
+                context.read<AuthBloc>().add(AuthEventLogIn(email, password));
+              },
+              child: Text("Login"),
+            ),
           ),
           TextButton(
             onPressed: () {

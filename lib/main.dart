@@ -34,14 +34,25 @@ void main() {
   );
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
     context.read<AuthBloc>().add(const AuthEventInitialise());
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
+        print(state);
         if (state is AuthStateLoggedIn) {
           return const NotesView();
         }
@@ -50,8 +61,9 @@ class HomePage extends StatelessWidget {
         }
         if (state is AuthStateLoggedOut) {
           return const LoginView();
+        } else {
+          return const Scaffold(body: CircularProgressIndicator());
         }
-        return const Scaffold(body: CircularProgressIndicator());
       },
     );
   }
