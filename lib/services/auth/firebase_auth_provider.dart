@@ -6,6 +6,7 @@ import 'package:notes_app/services/auth/auth_exceptions.dart';
 
 import 'package:notes_app/services/auth/auth_provider.dart';
 import 'package:notes_app/services/auth/auth_user.dart';
+import 'dart:developer' as devtools show log;
 
 class FirebaseAuthProvider implements AuthProvider {
   @override
@@ -24,6 +25,7 @@ class FirebaseAuthProvider implements AuthProvider {
       }
       return user;
     } on FirebaseAuthException catch (e) {
+      devtools.log(e.code);
       if (e.code == "email-already-in-use") {
         throw EmailAlreadyInUseAuthException();
       } else if (e.code == "weak-password") {
@@ -94,11 +96,11 @@ class FirebaseAuthProvider implements AuthProvider {
     }
     return null;
   }
-  
+
   @override
   Future<void> initialise() async {
     await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
   }
 }
